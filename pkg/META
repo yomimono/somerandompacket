@@ -1,0 +1,7 @@
+description = "throw stuff at unmarshallers"
+version = "%%VERSION_NUM%%"
+requires = "tcpip tcpip.ethif tcpip.icmpv4 tcpip.ipv4 tcpip.udp tcpip.tcp ipaddr afl-persistent"
+archive(byte) = "fuzz.cma"
+archive(native) = "fuzz.cmxa"
+plugin(byte) = "fuzz.cma"
+plugin(native) = "fuzz.cmxs"
