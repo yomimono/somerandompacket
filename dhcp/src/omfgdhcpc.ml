@@ -41,6 +41,86 @@ let static_routes : (Ipaddr.V4.t * Ipaddr.V4.t) gen =
 let opt_code : option_code gen =
   Map ([uint8], do_your_best int_to_option_code)
 
+let unassigned_code : option_code gen =
+  Choose [
+    Const UNASSIGNED_84;
+    Const UNASSIGNED_96;
+    Const UNASSIGNED_102;
+    Const UNASSIGNED_103;
+    Const UNASSIGNED_104;
+    Const UNASSIGNED_105;
+    Const UNASSIGNED_106;
+    Const UNASSIGNED_107;
+    Const UNASSIGNED_108;
+    Const UNASSIGNED_109;
+    Const UNASSIGNED_110;
+    Const UNASSIGNED_111;
+    Const UNASSIGNED_115;
+    Const UNASSIGNED_126;
+    Const UNASSIGNED_127;
+    Const UNASSIGNED_143;
+    Const UNASSIGNED_147;
+    Const UNASSIGNED_148;
+    Const UNASSIGNED_149;
+    Const UNASSIGNED_161;
+    Const UNASSIGNED_162;
+    Const UNASSIGNED_163;
+    Const UNASSIGNED_164;
+    Const UNASSIGNED_165;
+    Const UNASSIGNED_166;
+    Const UNASSIGNED_167;
+    Const UNASSIGNED_168;
+    Const UNASSIGNED_169;
+    Const UNASSIGNED_170;
+    Const UNASSIGNED_171;
+    Const UNASSIGNED_172;
+    Const UNASSIGNED_173;
+    Const UNASSIGNED_174;
+    Const UNASSIGNED_178;
+    Const UNASSIGNED_179;
+    Const UNASSIGNED_180;
+    Const UNASSIGNED_181;
+    Const UNASSIGNED_182;
+    Const UNASSIGNED_183;
+    Const UNASSIGNED_184;
+    Const UNASSIGNED_185;
+    Const UNASSIGNED_186;
+    Const UNASSIGNED_187;
+    Const UNASSIGNED_188;
+    Const UNASSIGNED_189;
+    Const UNASSIGNED_190;
+    Const UNASSIGNED_191;
+    Const UNASSIGNED_192;
+    Const UNASSIGNED_193;
+    Const UNASSIGNED_194;
+    Const UNASSIGNED_195;
+    Const UNASSIGNED_196;
+    Const UNASSIGNED_197;
+    Const UNASSIGNED_198;
+    Const UNASSIGNED_199;
+    Const UNASSIGNED_200;
+    Const UNASSIGNED_201;
+    Const UNASSIGNED_202;
+    Const UNASSIGNED_203;
+    Const UNASSIGNED_204;
+    Const UNASSIGNED_205;
+    Const UNASSIGNED_206;
+    Const UNASSIGNED_207;
+    Const UNASSIGNED_214;
+    Const UNASSIGNED_215;
+    Const UNASSIGNED_216;
+    Const UNASSIGNED_217;
+    Const UNASSIGNED_218;
+    Const UNASSIGNED_219;
+    Const UNASSIGNED_222;
+    Const UNASSIGNED_223;
+  ]
+
+let unassigned : dhcp_option gen =
+  Map ([unassigned_code; bytes], fun a s ->
+  Unassigned (a, s)
+)
+
 let client_id : client_id gen =
   Choose [
     Map ([macaddr], fun a -> Hwaddr a);
@@ -65,7 +145,7 @@ let opt : dhcp_option gen =
     Map ([List1 ipv4], fun a -> Impress_servers a);
     Map ([List1 ipv4], fun a -> Rsclocation_servers a);
     Map ([bytes], fun a -> Hostname a);
-    Map ([int], fun a -> Bootfile_size a);
+    Map ([uint16], fun a -> Bootfile_size a);
     Map ([bytes], fun a -> Merit_dumpfile a);
     Map ([bytes], fun a -> Domain_name a);
     Map ([ipv4], fun a -> Swap_server a);
@@ -74,12 +154,11 @@ let opt : dhcp_option gen =
     Map ([bool], fun a -> Ipforwarding a);
     Map ([bool], fun a -> Nlsr a);
     Map ([List1 ipv4_prefix], fun a -> Policy_filters a);
-    Map ([int], fun a -> Max_datagram a);
-    Map ([int], fun a -> Default_ip_ttl a);
-    Map ([int], fun a -> Default_ip_ttl a);
+    Map ([uint16], fun a -> Max_datagram a);
+    Map ([uint8], fun a -> Default_ip_ttl a);
     Map ([int32], fun a -> Pmtu_ageing_timo a);
-    Map ([List1 int], fun a -> Pmtu_plateau_table a);
-    Map ([int], fun a -> Interface_mtu a);
+    Map ([List1 uint16], fun a -> Pmtu_plateau_table a);
+    Map ([uint16], fun a -> Interface_mtu a);
     Map ([bool], fun a -> All_subnets_local a);
     Map ([ipv4], fun a -> Broadcast_addr a);
     Map ([bool], fun a -> Perform_mask_discovery a);
@@ -90,27 +169,27 @@ let opt : dhcp_option gen =
     Map ([bool], fun a -> Trailer_encapsulation a);
     Map ([int32], fun a -> Arp_cache_timo a);
     Map ([bool], fun a -> Ethernet_encapsulation a);
-    Map ([int], fun a -> Tcp_default_ttl a);
+    Map ([uint8], fun a -> Tcp_default_ttl a);
     Map ([int32], fun a -> Tcp_keepalive_interval a);
-    Map ([int], fun a -> Tcp_keepalive_garbage a);
+    Map ([uint8], fun a -> Tcp_keepalive_garbage a);
     Map ([bytes], fun a -> Nis_domain a);
     Map ([List1 ipv4], fun a -> Nis_servers a);
     Map ([List1 ipv4], fun a -> Ntp_servers a);
     Map ([bytes], fun a -> Vendor_specific a);
     Map ([List1 ipv4], fun a -> Netbios_name_servers a);
     Map ([List1 ipv4], fun a -> Netbios_datagram_distrib_servers a);
-    Map ([int], fun a -> Netbios_node a);
+    Map ([uint8], fun a -> Netbios_node a);
     Map ([bytes], fun a -> Netbios_scope a);
     Map ([List1 ipv4], fun a -> Xwindow_font_servers a);
     Map ([List1 ipv4], fun a -> Xwindow_display_managers a);
     Map ([ipv4], fun a -> Request_ip a);
     Map ([int32], fun a -> Ip_lease_time a);
-    Map ([int], fun a -> Option_overload a);
+    Map ([uint8], fun a -> Option_overload a);
     Map ([msgtype], fun a -> Message_type a);
     Map ([ipv4], fun a -> Server_identifier a);
     Map ([List1 opt_code], fun a -> Parameter_requests a);
     Map ([bytes], fun a -> Message a);
-    Map ([int], fun a -> Max_message a);
+    Map ([uint16], fun a -> Max_message a);
     Map ([int32], fun a -> Renewal_t1 a);
     Map ([int32], fun a -> Rebinding_t2 a);
     Map ([bytes], fun a -> Vendor_class_id a);
@@ -156,7 +235,7 @@ let opt : dhcp_option gen =
     Map ([bytes], fun a -> Netinfo_address a);
     Map ([bytes], fun a -> Netinfo_tag a);
     Map ([bytes], fun a -> Url a);
-    Map ([int], fun a -> Auto_config a);
+    Map ([uint8], fun a -> Auto_config a);
     Map ([bytes], fun a -> Name_service_search a);
     Map ([ipv4], fun a -> Subnet_selection a);
     Map ([bytes], fun a -> Domain_search a);
@@ -190,8 +269,8 @@ let opt : dhcp_option gen =
     Map ([int32], fun a -> Start_time_of_state a);
     Map ([int32], fun a -> Query_start_time a);
     Map ([int32], fun a -> Query_end_time a);
-    Map ([int], fun a -> Dhcp_state a);
-    Map ([int], fun a -> Data_source a);
+    Map ([uint8], fun a -> Dhcp_state a);
+    Map ([uint8], fun a -> Data_source a);
     Map ([bytes], fun a -> V4_pcp_server a);
     Map ([bytes], fun a -> V4_portparams a);
     Map ([bytes], fun a -> Dhcp_captive_portal a);
@@ -204,11 +283,14 @@ let opt : dhcp_option gen =
     Map ([int32], fun a -> Reboot_time a);
     Map ([bytes], fun a -> Option_6rd a);
     Map ([bytes], fun a -> V4_access_domain a);
-    Map ([int], fun a -> Subnet_allocation a);
+    Map ([uint8], fun a -> Subnet_allocation a);
     Map ([bytes], fun a -> Virtual_subnet_selection a);
     Map ([bytes], fun a -> Web_proxy_auto_disc a);
     Const End;
-    Map ([opt_code; bytes], fun a b -> Unassigned (a, b));
+    (* if we don't restrict "Unassigned" to stuff we don't know about,
+     * we end up getting false negative results on the deserialize/serialize
+     * equality test *)
+    unassigned;
   ]
 
 let op : op gen =
@@ -231,9 +313,9 @@ let packet ?with_msgtype () : pkt gen =
       uint16; uint16;
       op;
       htype; hlen;
-      uint16;
+      uint8;
       int32;
-      int;
+      uint16;
       flags;
       ipv4; ipv4; ipv4; ipv4;
       macaddr;
@@ -241,7 +323,17 @@ let packet ?with_msgtype () : pkt gen =
       msg_gen;
       List1 opt;
     ], fun srcmac dstmac srcip dstip srcport dstport op htype hlen hops xid secs
-           flags ciaddr yiaddr siaddr giaddr chaddr sname file msg opt ->
+           flags ciaddr yiaddr siaddr giaddr chaddr raw_sname raw_file msg opt ->
+           (* coercing the random sname and file into a correctly-sized fixed
+            * buffer is a bit annoying, and additionally we need to handle the empty case *)
+           let sname, file = Bytes.create 64, Bytes.create 128 in
+           Bytes.fill sname 0 64 '\000';
+           Bytes.fill file 0 64 '\000';
+           Bytes.blit (Bytes.of_string raw_sname) 0 sname 0 (min 64 (String.length raw_sname));
+           Bytes.blit (Bytes.of_string raw_file) 0 file 0 (min 128 (String.length raw_file));
+           let sname = match raw_sname with | "" -> "" | _ -> Bytes.to_string sname
+           and file = match raw_file with | "" -> "" | _ -> Bytes.to_string file
+           in
            { srcmac = srcmac; dstmac; srcip; dstip; srcport; dstport;
              op; htype; hlen; hops; xid; secs; flags;
              ciaddr; yiaddr; siaddr; giaddr; chaddr; sname; file;
@@ -284,9 +376,7 @@ let serialize_deserialize () =
   in
   add_test ~name:"records print/parse and are the same" [packet ()] @@ fun pkt ->
   let serialized = buf_of_pkt pkt in
-    let deserialized =
-      pkt_of_buf serialized (Cstruct.len serialized) |> Rresult.R.get_ok
-    in
+    let deserialized = really_parse serialized in
     check_eq ~pp ~cmp:(fun a b -> String.compare (pkt_to_string a) (Dhcp_wire.pkt_to_string b))
     pkt deserialized
 
@@ -351,6 +441,7 @@ let lease_in_four () =
 let () =
   discovering_clients_are_fresh ();
   record_is_serializable ();
+  serialize_deserialize ();
   discovering_clients_ask_for_opt_code ();
   xid_mismatch_always_noop ();
   one_message_no_lease ();
