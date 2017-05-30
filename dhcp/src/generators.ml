@@ -18,7 +18,7 @@ let static_routes : (Ipaddr.V4.t * Ipaddr.V4.t) Crowbar.gen =
   Crowbar.Map (Crowbar.[ipv4; ipv4], fun a b -> a, b)
 
 let opt_code : Dhcp_wire.option_code Crowbar.gen =
-  Crowbar.Map (Crowbar.[uint8], Crowbar.or_bad_test Dhcp_wire.int_to_option_code)
+  Crowbar.Map (Crowbar.[uint8], fun a -> Dhcp_wire.int_to_option_code a |> Crowbar.nonetheless)
 
 let unassigned_code : Dhcp_wire.option_code Crowbar.gen =
  Crowbar.Choose [
@@ -107,7 +107,7 @@ let client_id : Dhcp_wire.client_id Crowbar.gen =
   ]
 
 let msgtype : Dhcp_wire.msgtype Crowbar.gen =
-  Crowbar.Map (Crowbar.[range 14], fun a -> Crowbar.or_bad_test Dhcp_wire.int_to_msgtype (a+1))
+  Crowbar.Map (Crowbar.[range 14], fun a -> Dhcp_wire.int_to_msgtype (a+1) |> Crowbar.nonetheless)
 
 let opt : Dhcp_wire.dhcp_option Crowbar.gen =
  Crowbar.Choose [
