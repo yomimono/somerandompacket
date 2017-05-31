@@ -1,5 +1,5 @@
 true : bin_annot, safe_string
 true : warn(A)
-true : package(tcpip tcpip.ethif tcpip.ipv4 tcpip.icmpv4 tcpip.udp tcpip.tcp afl-persistent)
+true : package(tcpip tcpip.ethif tcpip.arpv4 tcpip.ipv4 tcpip.icmpv4 tcpip.udp tcpip.tcp crowbar)
 
 <src> : include
