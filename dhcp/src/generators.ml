@@ -313,7 +313,7 @@ let packet ?with_msgtype () : Dhcp_wire.pkt Crowbar.gen =
              not !non_null
            in
            Bytes.fill sname 0 64 '\000';
-           Bytes.fill file 0 64 '\000';
+           Bytes.fill file 0 128 '\000';
            Bytes.blit (Bytes.of_string raw_sname) 0 sname 0 (min 64 (String.length raw_sname));
            Bytes.blit (Bytes.of_string raw_file) 0 file 0 (min 128 (String.length raw_file));
            let sname = match is_null sname with | true -> "" | _ -> Bytes.to_string sname
