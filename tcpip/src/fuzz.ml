@@ -17,3 +17,16 @@ let main ~f ~pp () =
    match f @@ Cstruct.of_string @@ get_input () with
    | Ok (h, _p) -> Format.printf "%a" pp h
    | Error e -> Format.printf "%s" e
+
+let identity ?pp ?eq ~serialize ~deserialize gen =
+  Crowbar.add_test ~name:"deserialize/serialize" Crowbar.[gen] @@ fun t ->
+  Crowbar.check_eq ?pp ?eq t
+    (serialize t |> deserialize |>
+     function | Error _ -> Crowbar.bad_test () | Ok n -> n)
+
+let identity_more ?pp ?eq ~serialize ~deserialize gen =
+  Crowbar.add_test ~name:"deserialize/serialize" Crowbar.[gen] @@ fun t ->
+  Crowbar.check_eq ?pp ?eq t
+    (serialize t |> deserialize |>
+     function | Error _ -> Crowbar.bad_test () | Ok (n, _p) -> n)
+

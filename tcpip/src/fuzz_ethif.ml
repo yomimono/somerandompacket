@@ -1,3 +1,6 @@
-let main = Fuzz.main ~f:Ethif_packet.Unmarshal.of_cstruct ~pp:Ethif_packet.pp
-
-let () = AflPersistent.run main
+let () =
+  Fuzz.identity_more
+  ~pp:Ethif_packet.pp
+  ~serialize:Ethif_packet.Marshal.make_cstruct
+  ~deserialize:Ethif_packet.Unmarshal.of_cstruct
+  Generators.ethif_packet
