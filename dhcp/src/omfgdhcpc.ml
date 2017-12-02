@@ -12,11 +12,14 @@ let really_parse buf =
   | Ok t -> t
 
 let discovering_client : (Dhcp_client.t * Cstruct.t) Crowbar.gen =
-  Crowbar.map (Crowbar.[Generators.macaddr; list1 Generators.opt_code]) (fun m o ->
+  Crowbar.map (Crowbar.[Generators.Macaddr.to_crowbar;
+                        list1 Generators.option_code_to_crowbar]) (fun m o ->
   Dhcp_client.create ~requests:o m)
 
 let range_server : Dhcp_server.Config.t Crowbar.gen =
-  Crowbar.map Crowbar.[Generators.macaddr; Generators.ipv4_prefix] (fun m network ->
+  Crowbar.map Crowbar.[Generators.Macaddr.to_crowbar;
+                       Generators.Ipaddr.V4.Prefix.to_crowbar]
+    (fun m network ->
     Crowbar.guard (Ipaddr.V4.Prefix.bits network < 30);
       (* need room for our ip + at least one in the range *)
     let ip = Ipaddr.V4.Prefix.network network in
@@ -33,7 +36,8 @@ let discovering_clients_are_fresh () =
 
 let discovering_clients_ask_for_opt_code () =
   Crowbar.add_test ~name:"discovering_clients ask for the given option codes"
-    Crowbar.[Generators.macaddr; list1 Generators.opt_code] @@ fun m o ->
+    Crowbar.[Generators.Macaddr.to_crowbar; list1
+               Generators.option_code_to_crowbar] @@ fun m o ->
   let (_c, b) = Dhcp_client.create ~requests:o m in
   let b = really_parse b in
   Crowbar.check_eq Dhcp_wire.(find_parameter_requests b.options) (Some o)
