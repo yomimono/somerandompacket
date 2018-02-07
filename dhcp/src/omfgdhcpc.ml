@@ -12,11 +12,11 @@ let really_parse buf =
   | Ok t -> t
 
 let discovering_client : (Dhcp_client.t * Cstruct.t) Crowbar.gen =
-  Crowbar.Map (Crowbar.[Generators.macaddr; List1 Generators.opt_code], fun m o ->
+  Crowbar.map Crowbar.[Generators.macaddr; list1 Generators.opt_code] (fun m o ->
   Dhcp_client.create ~requests:o m)
 
 let range_server : Dhcp_server.Config.t Crowbar.gen =
-  Crowbar.Map (Crowbar.[Generators.macaddr; Generators.ipv4_prefix], fun m network ->
+  Crowbar.map Crowbar.[Generators.macaddr; Generators.ipv4_prefix] (fun m network ->
     Crowbar.guard (Ipaddr.V4.Prefix.bits network < 30);
       (* need room for our ip + at least one in the range *)
     let ip = Ipaddr.V4.Prefix.network network in
@@ -33,7 +33,7 @@ let discovering_clients_are_fresh () =
 
 let discovering_clients_ask_for_opt_code () =
   Crowbar.add_test ~name:"discovering_clients ask for the given option codes"
-    Crowbar.[Generators.macaddr; List1 Generators.opt_code] @@ fun m o ->
+    Crowbar.[Generators.macaddr; list1 Generators.opt_code] @@ fun m o ->
   let (_c, b) = Dhcp_client.create ~requests:o m in
   let b = really_parse b in
   Crowbar.check_eq Dhcp_wire.(find_parameter_requests b.options) (Some o)
@@ -99,8 +99,7 @@ let lease_in_four () =
       | Input.Reply (dhcpoffer, db) -> (dhcpoffer, db)
     in
     let err_no_response pkt =
-      Error (fun ppf () -> Crowbar.pp ppf "no response to %s" @@
-      Dhcp_wire.pkt_to_string pkt)
+      Crowbar.fail ("no response to " ^ Dhcp_wire.pkt_to_string pkt)
     in
     let time = 0l in
     let dhcpdiscover = really_parse send_me in
@@ -108,16 +107,14 @@ let lease_in_four () =
     match Dhcp_client.input c (Dhcp_wire.buf_of_pkt dhcpoffer) with
     | `Noop -> err_no_response dhcpoffer
     | `New_lease (_c, lease) ->
-      Error (fun ppf () -> Crowbar.pp ppf "client thought dhcpoffer gave it a lease %s" @@
-      Dhcp_wire.pkt_to_string lease)
+       Crowbar.fail ("client thought dhcpoffer gave it a lease " ^ Dhcp_wire.pkt_to_string lease)
     | `Response (c, dhcprequest) ->
       let dhcprequest = really_parse dhcprequest in
       let (dhcpack, _db) = really_input s db dhcprequest time in
       match Dhcp_client.input c (Dhcp_wire.buf_of_pkt dhcpack) with
       | `Noop -> err_no_response dhcpack
       | `Response (_c, wat) ->
-        Error (fun ppf () -> Crowbar.pp ppf "response to dhcpack: %s" @@
-        Dhcp_wire.pkt_to_string (really_parse wat))
+         Crowbar.fail ("response to dhcpack: " ^ Dhcp_wire.pkt_to_string (really_parse wat))
       | `New_lease (c, l) -> Crowbar.check_eq (Dhcp_client.lease c) (Some l)
 
 let () =
